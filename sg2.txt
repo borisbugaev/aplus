@@ -1,0 +1,6 @@
+Examples of connectionless protocols include DHCP and TFTP.
+SSH and HTTPS are connection-oriented protocols.
+PoE is defined in IEEE 802.3af
+PoE+ is implemented in IEEE 802.3at
+IEEE 802.3bt implements PoE++ and 4PPoE
+ONT refers to fiber-optic equipment that can be found at a demarc.
