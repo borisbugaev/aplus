@@ -84,7 +84,7 @@ func mlt_chc_acr_r(txt []string, ans string, acro string) [Choices]string {
 	}
 	optns := [Choices]string{}
 	for i := range Choices {
-		optns[order[i]] = txt[0] + acrw[i] + txt[1]
+		optns[order[i]] = txt[0] + acrw[vals[i]] + txt[1]
 	}
 	return optns
 }
