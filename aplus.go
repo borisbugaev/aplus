@@ -43,11 +43,6 @@ func main() {
 		line_slc = append(line_slc, line)
 		line_count++
 	}
-	a_set := []string{}
-	for i := range len(line_slc) {
-		a := strings.Split(line_slc[i], ":")[1]
-		a_set = append(a_set, a)
-	}
 	fmt.Print("# Questions to ask>> ")
 	scanr.Scan()
 	qstr := scanr.Text()
@@ -76,4 +71,5 @@ func main() {
 		}
 		counter++
 	}
+	review(wrong_set)
 }

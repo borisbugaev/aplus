@@ -17,3 +17,9 @@ Which protocol allows NetBIOS services to be used over TCP/IP networks? : NetBT
 Which protocol offers improved functionality to POP3, while serving the same basic purpose? : IMAP4
 What is a type of protocol used in network management systems for monitoring network-attached devices? : SNMP
 What is an example of a directory access protocol? : LDAP
+What are examples of connectionless protocols? : DHCP, TFTP
+What are examples of connection oriented protocols? : HTTPS, SSH
+What standard defines PoE? : IEEE 802.3af
+Which standard implements PoE+? : IEEE 802.3at
+Which standard implements PoE++? : IEEE 802.3bt
+Which standard implements 4PPoE? : IEEE 802.3bt
