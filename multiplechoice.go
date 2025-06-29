@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -51,8 +52,46 @@ func mlt_chc_i_rndmz(txt []string, val int) [Choices]string {
 	return opts
 }
 
-func get_mult_choic(ans string) bool {
+func mlt_chc_acr_r(txt []string, ans string, acro string) [Choices]string {
+	acrw := strings.Fields(acro)
+	seed := rand.New(rand.NewSource(98))
+	set := map[int]bool{}
+	order := [Choices]int{}
+	for i := range Choices {
+		ith_val := seed.Intn(Choices)
+		_, includes := set[ith_val]
+		for includes {
+			ith_val = seed.Intn(Choices)
+			_, includes = set[ith_val]
+		}
+		set[ith_val] = true
+		order[i] = ith_val
+	}
+	set = map[int]bool{} //clear set
+	vals := [Choices]int{}
+	vals[0] = slices.Index(acrw, ans)
+	set[vals[0]] = true
+	j := 1
+	for j < Choices {
+		index := seed.Intn(len(acrw))
+		_, includes := set[index]
+		for includes {
+			index = seed.Intn(len(acrw))
+			_, includes = set[index]
+		}
+		set[index] = true
+		vals[j] = index
+	}
 	optns := [Choices]string{}
+	for i := range Choices {
+		optns[order[i]] = txt[0] + acrw[i] + txt[1]
+	}
+	return optns
+}
+
+func get_mult_choic(ans string, acro string) bool {
+	optns := [Choices]string{}
+	acrw := strings.Fields(acro)
 	words := strings.Fields(ans)
 	for i := range len(words) {
 		w_num, err := strconv.Atoi(words[i])
@@ -60,6 +99,14 @@ func get_mult_choic(ans string) bool {
 			splt := strings.Split(ans, words[i])
 			if len(splt) == 2 {
 				optns = mlt_chc_i_rndmz(splt, w_num)
+			}
+		}
+	}
+	for j := range len(acrw) {
+		if strings.Contains(ans, acrw[j]) {
+			splt := strings.Split(ans, acrw[j])
+			if len(splt) == 2 {
+				optns = mlt_chc_acr_r(splt, words[j], acro)
 			}
 		}
 	}
