@@ -3,6 +3,7 @@
 \aplus_test.go
 \multiplechoice_test.go
 aplus.exe
-
-QUESTIONS.TXT
-ACRONYMS.TXT
+QUESTIONS.txt
+PROTOCOLS.csv
+IEEE.csv
+ACRONYMS.csv

@@ -14,52 +14,70 @@ import (
 const Choices int = 4
 const Choices_ext int = 6
 
-func quiz(ans string, acro string) bool {
-	is_cs := strings.Contains(ans, ",")
-	if is_cs {
-		return get_multi_answrs(ans, acro)
-	}
-	has_int := strings.ContainsAny(ans, "0123456789")
-	has_acro := false
-	acwrds := strings.Fields(acro)
-	for i := range len(acwrds) {
-		if strings.Contains(ans, acwrds[i]) {
-			has_acro = true
+func quiz(ans string, typesmap map[string]string) bool {
+	type_names := strings.Split(typesmap["DEFAULT"], ",")
+	var my_type string = "NOTYPE"
+	for _, name := range type_names {
+		twords := strings.Split(typesmap[name], ",")
+		for _, word := range twords {
+			if strings.Contains(ans, word) {
+				my_type = name
+				break
+			}
 		}
 	}
-	if has_int || has_acro {
-		return get_mult_choic(ans, acro)
+	is_cs := strings.Contains(ans, ",")
+	if is_cs {
+		return get_multi_answrs(ans, typesmap[my_type])
 	}
-	scanr := bufio.NewScanner(os.Stdin)
-	fmt.Print(">> ")
-	scanr.Scan()
-	response := scanr.Text()
-	return response == ans
+	if my_type == "NOTYPE" {
+		scanr := bufio.NewScanner(os.Stdin)
+		fmt.Print(">> ")
+		scanr.Scan()
+		response := scanr.Text()
+		return response == ans
+	}
+
+	return get_mult_choic(ans, typesmap[my_type])
 }
 
 func main() {
-	file, err := os.Open("QUESTIONS.TXT")
+	q_file, err := os.Open("QUESTIONS.TXT")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
-	afile, err := os.Open("ACRONYMS.TXT")
+	defer q_file.Close()
+	use_file, err := os.Open("USE.csv")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer afile.Close()
+	defer use_file.Close()
 
 	line_count := 0
-	fscanr := bufio.NewScanner(file)
+	fscanr := bufio.NewScanner(q_file)
 	var line_slc = []string{}
 	for fscanr.Scan() {
 		line := fscanr.Text()
 		line_slc = append(line_slc, line)
 		line_count++
 	}
-	fscanr = bufio.NewScanner(afile)
+	fscanr = bufio.NewScanner(use_file)
 	fscanr.Scan()
-	aln := fscanr.Text()
+	types_csv := fscanr.Text()
+	type_names := strings.Split(types_csv, ",")
+	type_map := map[string]string{}
+	type_map["DEFAULT"] = types_csv
+	for _, typename := range type_names {
+		t_f_name := fmt.Sprintf("USING/%s.csv", typename)
+		t_file, err := os.Open(t_f_name)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer t_file.Close()
+		fscanr = bufio.NewScanner(t_file)
+		fscanr.Scan()
+		type_map[typename] = fscanr.Text()
+	}
 	scanr := bufio.NewScanner(os.Stdin)
 	fmt.Print("# Questions to ask>> ")
 	scanr.Scan()
@@ -88,7 +106,7 @@ func main() {
 		question := strings.Split(r_line, ":")[0]
 		answer := strings.Split(r_line, ":")[1]
 		fmt.Println(question)
-		correct = quiz(answer, aln)
+		correct = quiz(answer, type_map)
 		if !correct {
 			wrong_set = append(wrong_set, r_line)
 		}

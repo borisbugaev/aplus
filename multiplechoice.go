@@ -21,7 +21,7 @@ func get_multi_answrs(ans string, acro string) bool {
 		set[answrs[i]] = true
 	}
 	a_set := set
-	acrw := strings.Fields(acro)
+	acrw := strings.Split(acro, ",")
 	for range Choices_ext {
 		to_insert := acrw[seed.Intn(len(acrw))]
 		_, includes := set[to_insert]
@@ -109,6 +109,7 @@ func mlt_chc_i_rndmz(txt []string, val int) [Choices]string {
 		}
 		set[diff] = true
 		vals[j] = val + diff
+		j++
 	}
 	opts := [Choices]string{}
 	for i := range Choices {
@@ -118,7 +119,7 @@ func mlt_chc_i_rndmz(txt []string, val int) [Choices]string {
 }
 
 func mlt_chc_acr_r(txt []string, ans string, acro string) [Choices]string {
-	acrw := strings.Fields(acro)
+	acrw := strings.Split(acro, ",")
 	seed := rand.New(rand.NewSource(time.Now().UnixNano()))
 	set := map[int]bool{}
 	order := [Choices]int{}
@@ -157,30 +158,40 @@ func mlt_chc_acr_r(txt []string, ans string, acro string) [Choices]string {
 
 func get_mult_choic(ans string, acro string) bool {
 	optns := [Choices]string{}
-	acrw := strings.Fields(acro)
 	words := strings.Fields(ans)
+	acrw := strings.Split(acro, ",")
 	for i := range len(words) {
 		w_num, err := strconv.Atoi(words[i])
 		if err == nil {
 			if len(words) == 1 {
 				txt := []string{"", ""}
 				optns = mlt_chc_i_rndmz(txt, w_num)
-			}
-			splt := strings.Split(ans, words[i])
-			if len(splt) == 2 {
-				optns = mlt_chc_i_rndmz(splt, w_num)
+				break
+			} else {
+				txt := []string{"", ""}
+				var cut_success bool
+				txt[0], txt[1], cut_success = strings.Cut(ans, words[i])
+				if cut_success {
+					optns = mlt_chc_i_rndmz(txt, w_num)
+					break
+				}
 			}
 		}
 	}
 	for j := range len(acrw) {
 		if strings.Contains(ans, acrw[j]) {
-			if len(ans) == 1 {
+			if len(words) == 1 {
 				txt := []string{"", ""}
 				optns = mlt_chc_acr_r(txt, acrw[j], acro)
-			}
-			splt := strings.Split(ans, acrw[j])
-			if len(splt) == 2 {
-				optns = mlt_chc_acr_r(splt, acrw[j], acro)
+				break
+			} else {
+				txt := []string{"", ""}
+				var cut_success bool
+				txt[0], txt[1], cut_success = strings.Cut(ans, acrw[j])
+				if cut_success {
+					optns = mlt_chc_acr_r(txt, acrw[j], acro)
+					break
+				}
 			}
 		}
 	}
