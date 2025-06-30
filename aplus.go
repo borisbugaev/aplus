@@ -8,11 +8,17 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const Choices int = 4
+const Choices_ext int = 6
 
 func quiz(ans string, acro string) bool {
+	is_cs := strings.Contains(ans, ",")
+	if is_cs {
+		return get_multi_answrs(ans, acro)
+	}
 	has_int := strings.ContainsAny(ans, "0123456789")
 	has_acro := false
 	acwrds := strings.Fields(acro)
@@ -32,19 +38,12 @@ func quiz(ans string, acro string) bool {
 }
 
 func main() {
-	scanr := bufio.NewScanner(os.Stdin)
-	fmt.Print("questions file path>> ")
-	scanr.Scan()
-	fpath := scanr.Text()
-	file, err := os.Open(fpath)
+	file, err := os.Open("QUESTIONS.TXT")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
-	fmt.Print("acronym path>> ")
-	scanr.Scan()
-	fpath = scanr.Text()
-	afile, err := os.Open(fpath)
+	afile, err := os.Open("ACRONYMS.TXT")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -61,6 +60,7 @@ func main() {
 	fscanr = bufio.NewScanner(afile)
 	fscanr.Scan()
 	aln := fscanr.Text()
+	scanr := bufio.NewScanner(os.Stdin)
 	fmt.Print("# Questions to ask>> ")
 	scanr.Scan()
 	qstr := scanr.Text()
@@ -72,7 +72,7 @@ func main() {
 	correct := false
 	quit := false
 	wrong_set := []string{}
-	seed := rand.New(rand.NewSource(99))
+	seed := rand.New(rand.NewSource(time.Now().UnixNano()))
 	prev_val := map[int]bool{}
 	for !quit {
 		if qquant == counter {

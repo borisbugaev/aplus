@@ -1,7 +1,7 @@
-Which standards provide AAA functionality? : TACACS+, RADIUS
+Which standards provide AAA functionality? : TACACS+,RADIUS
 Which protocol is used by the spam filter? : SMTP
-How can one determine the network segment an IP address is on? : Address Resolution Protocol
-What will be set when manually configuring a network adapter? : IP Address, Subnet Mask, Default Gateway, DNS Server Address
+How can one determine the network segment an IP address is on? : ARP
+What will be set when manually configuring a network adapter? : IP,Subnet Mask,Default Gateway,DNS
 Which standard uses 128-bit addresses? : IPv6
 Which expansion card enables communication in 802.11 networks? : WLAN
 What is a drawback of IPS displays? : slow response times
