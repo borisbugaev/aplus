@@ -6,4 +6,7 @@ aplus.exe
 QUESTIONS.txt
 IEEE.csv
 ACRONYMS.csv
+PORTS.csv
+BOOL.csv
 \zig
+UTILITIES/utilities.exe

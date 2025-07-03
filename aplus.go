@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"math/rand"
@@ -18,6 +19,9 @@ func quiz(ans string, typesmap map[string]string) bool {
 	type_names := strings.Split(typesmap["DEFAULT"], ",")
 	var my_type string = "NOTYPE"
 	for _, name := range type_names {
+		if name == "DEFAULT" {
+			continue
+		}
 		twords := strings.Split(typesmap[name], ",")
 		for _, word := range twords {
 			if strings.Contains(ans, word) {
@@ -61,30 +65,43 @@ func main() {
 		line_slc = append(line_slc, line)
 		line_count++
 	}
+	q_file.Close()
 	fscanr = bufio.NewScanner(use_file)
 	fscanr.Scan()
 	types_csv := fscanr.Text()
 	type_names := strings.Split(types_csv, ",")
 	type_map := map[string]string{}
+	use_file.Close()
 	type_map["DEFAULT"] = types_csv
 	for _, typename := range type_names {
-		t_f_name := fmt.Sprintf("USING/%s.csv", typename)
-		t_file, err := os.Open(t_f_name)
-		if err != nil {
-			log.Fatal(err)
+		if typename == "" || typename == "DEFAULT" {
+			continue
+		} else {
+			t_f_name := fmt.Sprintf("USING/%s.csv", typename)
+			t_file, err := os.Open(t_f_name)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer t_file.Close()
+			fscanr = bufio.NewScanner(t_file)
+			fscanr.Scan()
+			type_map[typename] = fscanr.Text()
+			t_file.Close()
 		}
-		defer t_file.Close()
-		fscanr = bufio.NewScanner(t_file)
-		fscanr.Scan()
-		type_map[typename] = fscanr.Text()
 	}
-	scanr := bufio.NewScanner(os.Stdin)
-	fmt.Print("# Questions to ask>> ")
-	scanr.Scan()
-	qstr := scanr.Text()
-	qquant, qerr := strconv.Atoi(qstr)
-	if qerr != nil {
-		qquant = 0
+	mqs_ptr := flag.Bool("mqs", false, "if true, question count is runtime defined")
+	flag.Parse()
+	qquant := 30 // else question count defaults to 30
+	if *mqs_ptr {
+		scanr := bufio.NewScanner(os.Stdin)
+		fmt.Print("# Questions to ask>> ")
+		scanr.Scan()
+		qstr := scanr.Text()
+		iqquant, qerr := strconv.Atoi(qstr)
+		if qerr != nil {
+			qquant = 0
+		}
+		qquant = iqquant
 	}
 	counter := 0
 	correct := false

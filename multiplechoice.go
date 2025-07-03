@@ -11,6 +11,37 @@ import (
 	"time"
 )
 
+func true_false(a bool) bool {
+	fmt.Println("TRUE\t\t\tFALSE")
+	scnr := bufio.NewScanner(os.Stdin)
+	fmt.Print(">> ")
+	scnr.Scan()
+	answr := scnr.Text()
+	answr = strings.ToLower(answr)
+	if answr == "true" && a {
+		return true
+	} else if answr == "false" && !a {
+		return true
+	}
+	return false
+}
+
+func q_concat(a [Choices]string, b [Choices]string) [Choices]string {
+	for i := range Choices {
+		if strings.Contains(b[i], "\a") {
+			continue
+		} else if a[i] == b[i] {
+			continue
+		} else if i%2 == 0 {
+			a[i] = b[i]
+			continue
+		} else {
+			continue
+		}
+	}
+	return a
+}
+
 func get_multi_answrs(ans string, acro string) bool {
 	seed := rand.New(rand.NewSource(time.Now().UnixNano()))
 	answrs := strings.Split(ans, ",")
@@ -138,7 +169,7 @@ func mlt_chc_acr_r(txt []string, ans string, acro string) [Choices]string {
 	vals[0] = slices.Index(acrw, ans)
 	set[vals[0]] = true
 	j := 1
-	for j < Choices {
+	for j < min(Choices, len(acrw)) {
 		index := seed.Intn(len(acrw))
 		_, includes := set[index]
 		for includes {
@@ -149,53 +180,76 @@ func mlt_chc_acr_r(txt []string, ans string, acro string) [Choices]string {
 		vals[j] = index
 		j++
 	}
+	out_acrw := [Choices]string{}
+	for i := range Choices {
+		if !set[vals[i]] {
+			out_acrw[i] = "\a"
+		} else {
+			out_acrw[i] = acrw[vals[i]]
+		}
+	}
 	optns := [Choices]string{}
 	for i := range Choices {
-		optns[order[i]] = txt[0] + acrw[vals[i]] + txt[1]
+		optns[order[i]] = txt[0] + out_acrw[i] + txt[1]
 	}
 	return optns
 }
 
 func get_mult_choic(ans string, acro string) bool {
-	optns := [Choices]string{}
 	words := strings.Fields(ans)
 	acrw := strings.Split(acro, ",")
+	if len(acrw) == 2 && acrw[0] == "True" {
+		correct_answer := words[0] == acrw[0]
+		return true_false(correct_answer)
+	}
+	intoptns := [Choices]string{"DEFAULT"}
 	for i := range len(words) {
 		w_num, err := strconv.Atoi(words[i])
 		if err == nil {
 			if len(words) == 1 {
 				txt := []string{"", ""}
-				optns = mlt_chc_i_rndmz(txt, w_num)
+				intoptns = mlt_chc_i_rndmz(txt, w_num)
 				break
 			} else {
 				txt := []string{"", ""}
 				var cut_success bool
 				txt[0], txt[1], cut_success = strings.Cut(ans, words[i])
 				if cut_success {
-					optns = mlt_chc_i_rndmz(txt, w_num)
+					intoptns = mlt_chc_i_rndmz(txt, w_num)
 					break
 				}
 			}
 		}
 	}
+	acroptns := [Choices]string{"DEFAULT"}
 	for j := range len(acrw) {
 		if strings.Contains(ans, acrw[j]) {
 			if len(words) == 1 {
 				txt := []string{"", ""}
-				optns = mlt_chc_acr_r(txt, acrw[j], acro)
+				acroptns = mlt_chc_acr_r(txt, acrw[j], acro)
 				break
 			} else {
 				txt := []string{"", ""}
 				var cut_success bool
 				txt[0], txt[1], cut_success = strings.Cut(ans, acrw[j])
 				if cut_success {
-					optns = mlt_chc_acr_r(txt, acrw[j], acro)
+					acroptns = mlt_chc_acr_r(txt, acrw[j], acro)
 					break
 				}
 			}
 		}
 	}
-
+	optns := [Choices]string{"DEFAULT"}
+	if intoptns[0] != "DEFAULT" && acroptns[0] != "DEFAULT" {
+		// concat
+		optns = q_concat(intoptns, acroptns)
+	} else if intoptns[0] != "DEFAULT" {
+		optns = intoptns
+	} else if acroptns[0] != "DEFAULT" {
+		optns = acroptns
+	} else {
+		// default case, should not occur
+	}
 	// print options and get answer
 	out_optns := [Choices]string{}
 	mp_optns := map[string]string{}
@@ -207,7 +261,11 @@ func get_mult_choic(ans string, acro string) bool {
 		mp_optns[llttr] = optns[i]
 	}
 	for i := range Choices {
-		fmt.Printf("%s\n", out_optns[i])
+		if strings.Contains(out_optns[i], "\a") {
+			continue
+		} else {
+			fmt.Printf("%s\n", out_optns[i])
+		}
 	}
 	scnnr := bufio.NewScanner(os.Stdin)
 	fmt.Print(">> ")

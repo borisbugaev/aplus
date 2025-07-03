@@ -8,10 +8,10 @@ What is a drawback of IPS displays? : slow response times
 What is a key advantage of docking stations? :Additional ports and capabilities compared to port replicators
 What is a database on a mobile device containing bands, sub-bands, and service provider IDs allowing the device to establish a connection with the correct cell phone tower? : PRL
 What is a dedicated mobile app management software? :MAM
-Is SMTP used for retrieving email messages from mail servers? :No
-Is SMTP used for sending email messages from a client device? :Yes
-Is POP3 protocol used for sending email messages? :No
-Is POP3 protocol used for email retrieval? :Yes
+SMTP is used for retrieving email messages from mail servers. :False
+SMTP is used for sending email messages from a client device. :True
+POP3 protocol is used for sending email messages. :False
+POP3 protocol is used for email retrieval. :True
 What is an API that enables communication between hosts on a LAN? :NetBIOS
 Which protocol allows NetBIOS services to be used over TCP/IP networks? :NetBT
 Which protocol offers improved functionality to POP3, while serving the same basic purpose? :IMAP4
