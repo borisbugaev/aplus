@@ -93,7 +93,8 @@ func main() {
 		}
 	}
 	mqs_ptr := flag.Bool("mqs", false, "if true, question count is runtime defined")
-	force_ptr := flag.Int("force", 0, "force first question")
+	force_ptr := flag.Int("force", -1, "force first question")
+	pedant_ptr := flag.Bool("pedant", false, "provide answer checks immediately")
 	flag.Parse()
 	qquant := 30 // else question count defaults to 30
 	if *mqs_ptr {
@@ -118,7 +119,7 @@ func main() {
 			quit = true
 			continue
 		}
-		if counter == 0 && counter != *force_ptr {
+		if counter == 0 && counter < *force_ptr {
 			line := line_slc[*force_ptr]
 			prev_val[*force_ptr] = true
 			q := strings.Split(line, ":")[0]
@@ -127,6 +128,10 @@ func main() {
 			correct = quiz(a, type_map)
 			if !correct {
 				wrong_set = append(wrong_set, line)
+				if *pedant_ptr {
+					fmt.Print("\x1b[1A\x1b[93;41m>>\x1b[G\n\x1b[0m")
+					fmt.Printf("\x1b[3m>> %s\x1b[0m\n", a)
+				}
 			}
 		}
 		rand_q_i := seed.Intn(line_count)
@@ -143,6 +148,10 @@ func main() {
 		correct = quiz(answer, type_map)
 		if !correct {
 			wrong_set = append(wrong_set, r_line)
+			if *pedant_ptr {
+				fmt.Print("\x1b[1A\x1b[93;41m>>\x1b[G\n\x1b[0m")
+				fmt.Printf("\x1b[3m>> %s\x1b[0m\n", answer)
+			}
 		}
 		counter++
 	}

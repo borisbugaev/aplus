@@ -54,7 +54,7 @@
             "program": "${workspaceFolder}",
             "args": [
                 "-force",
-                "38"
+                "20"
             ]
         }
     ]
