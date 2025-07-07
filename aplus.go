@@ -16,30 +16,33 @@ const Choices int = 4
 const Choices_ext int = 6
 
 func quiz(ans string, typesmap map[string]string) bool {
-	type_names := strings.Split(typesmap["DEFAULT"], ",")
 	var my_type string = "NOTYPE"
-	for _, name := range type_names {
+	type_names := strings.SplitSeq(typesmap["DEFAULT"], ",")
+	for name := range type_names {
 		if name == "DEFAULT" {
 			continue
 		}
-		twords := strings.Split(typesmap[name], ",")
-		for _, word := range twords {
+		twords := strings.SplitSeq(typesmap[name], ",")
+		for word := range twords {
 			if strings.Contains(ans, word) {
 				my_type = name
 				break
 			}
 		}
 	}
-	is_cs := strings.Contains(ans, ",")
-	if is_cs {
-		return get_multi_answrs(ans, typesmap[my_type])
-	}
 	if my_type == "NOTYPE" {
 		scanr := bufio.NewScanner(os.Stdin)
 		fmt.Print(">> ")
 		scanr.Scan()
 		response := scanr.Text()
+		response = strings.Trim(response, " ")
+		response = strings.ToLower(response)
+		ans = strings.ToLower(ans)
 		return response == ans
+	}
+	is_cs := strings.Contains(ans, ",")
+	if is_cs {
+		return get_multi_answrs(ans, typesmap[my_type])
 	}
 
 	return get_mult_choic(ans, typesmap[my_type])
@@ -122,6 +125,8 @@ func main() {
 		r_line := line_slc[rand_q_i]
 		question := strings.Split(r_line, ":")[0]
 		answer := strings.Split(r_line, ":")[1]
+		question = strings.Trim(question, " ")
+		answer = strings.Trim(answer, " ")
 		fmt.Println(question)
 		correct = quiz(answer, type_map)
 		if !correct {

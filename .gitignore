@@ -10,3 +10,4 @@ PORTS.csv
 BOOL.csv
 \zig
 UTILITIES/utilities.exe
+mc_term.go
