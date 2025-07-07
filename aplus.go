@@ -93,6 +93,7 @@ func main() {
 		}
 	}
 	mqs_ptr := flag.Bool("mqs", false, "if true, question count is runtime defined")
+	force_ptr := flag.Int("force", 0, "force first question")
 	flag.Parse()
 	qquant := 30 // else question count defaults to 30
 	if *mqs_ptr {
@@ -116,6 +117,17 @@ func main() {
 		if qquant == counter {
 			quit = true
 			continue
+		}
+		if counter == 0 && counter != *force_ptr {
+			line := line_slc[*force_ptr]
+			prev_val[*force_ptr] = true
+			q := strings.Split(line, ":")[0]
+			fmt.Println(q)
+			a := strings.Split(line, ":")[1]
+			correct = quiz(a, type_map)
+			if !correct {
+				wrong_set = append(wrong_set, line)
+			}
 		}
 		rand_q_i := seed.Intn(line_count)
 		for prev_val[rand_q_i] {

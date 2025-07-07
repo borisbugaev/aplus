@@ -57,7 +57,7 @@ func get_multi_answrs(ans string, acro string) bool {
 		to_insert := acrw[seed.Intn(len(acrw))]
 		_, includes := set[to_insert]
 		for includes {
-			to_insert := acrw[seed.Intn(len(answrs))]
+			to_insert := acrw[seed.Intn(len(acrw))]
 			_, includes = set[to_insert]
 		}
 		set[to_insert] = true
@@ -223,7 +223,7 @@ func get_mult_choic(ans string, acro string) bool {
 	}
 	acroptns := [Choices]string{"DEFAULT"}
 	for j := range len(acrw) {
-		if strings.Contains(ans, acrw[j]) {
+		if strings.Compare(ans, acrw[j]) == 0 {
 			if len(words) == 1 {
 				txt := []string{"", ""}
 				acroptns = mlt_chc_acr_r(txt, acrw[j], acro)

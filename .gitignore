@@ -8,6 +8,7 @@ IEEE.csv
 ACRONYMS.csv
 PORTS.csv
 BOOL.csv
+ALL.csv
 \zig
 UTILITIES/utilities.exe
 mc_term.go

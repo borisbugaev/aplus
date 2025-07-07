@@ -62,12 +62,60 @@ func overlap(my_dir string) {
 	}
 }
 
+func initialize(repeats bool) {
+	q_file, err := os.Open("../QUESTIONS.TXT")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer q_file.Close()
+	fscanr := bufio.NewScanner(q_file)
+	var line_slc = []string{}
+	for fscanr.Scan() {
+		line := fscanr.Text()
+		line_slc = append(line_slc, line)
+	}
+	q_file.Close()
+	all_file, err := os.Create("../USING/ALL.csv")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer all_file.Close()
+	all_str := ""
+	for _, line := range line_slc {
+		answer := strings.Split(line, ":")[1]
+		answer = strings.Trim(answer, " ")
+		all_str = fmt.Sprintf("%s%s,", all_str, answer)
+	}
+	if !repeats {
+		ans := strings.SplitSeq(all_str, ",")
+		an_set := map[string]bool{}
+		no_repeat := ""
+		for a := range ans {
+			_, includes := an_set[a]
+			if !includes {
+				no_repeat = fmt.Sprintf("%s%s,", no_repeat, a)
+			}
+			an_set[a] = true
+		}
+		all_str = no_repeat
+	}
+	all_str = strings.Trim(all_str, ",")
+	all_file.WriteString(all_str)
+	all_file.Sync()
+	all_file.Close()
+}
+
 func main() {
-	dir_ptr := flag.String("dir", "\a", "directory of CSV files")
+	dir_ptr := flag.String("dir", "../USING", "directory of CSV files")
 	o_ptr := flag.Bool("o", false, "should utilities run overlap?")
+	init_ptr := flag.Bool("init", false, "generate initial csv of answers")
+	re_ptr := flag.Bool("re", false, "include repeats")
 	flag.Parse()
 	my_dir := *dir_ptr
 	if *o_ptr {
 		overlap(my_dir)
+	}
+	if *init_ptr {
+		initialize(*re_ptr)
 	}
 }
