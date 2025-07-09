@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	printutils "github.com/borisbugaev/go_print_utils"
+	printutils "github.com/borisbugaev/go_print_utils/printutils"
 )
 
 func clear_lines(count int) {
