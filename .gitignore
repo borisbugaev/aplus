@@ -9,6 +9,8 @@ ACRONYMS.csv
 PORTS.csv
 BOOL.csv
 ALL.csv
+DISPLAY.csv
+\vendor
 \zig
 UTILITIES/utilities.exe
 mc_term.go
