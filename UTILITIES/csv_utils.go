@@ -210,7 +210,7 @@ func sort(dir string, to_sort string) {
 	}
 	else_subset := map[string]bool{}
 	for _, name := range names {
-		if name == to_sort {
+		if name == to_sort || name == "ALL.csv" {
 			continue
 		}
 		name_cont_seq := strings.SplitSeq(contents[name], ",")
