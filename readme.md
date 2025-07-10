@@ -6,5 +6,6 @@
 
 Also included is a separate utility program for managing the .csv files.
 
+Makes use of [go_print_utils](github.com/borisbugaev/go_print_utils), an extremely minimal package for managing terminal outputs. 
 
 At some point I will likely use this as a framework for a more sophisticated, possibly GUI, application.
