@@ -60,12 +60,12 @@ func quiz(ans string, typesmap map[string]string) bool {
 }
 
 func main() {
-	q_file, err := os.Open("QUESTIONS.TXT")
+	q_file, err := os.Open("USING/QUESTIONS.TXT")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer q_file.Close()
-	use_file, err := os.Open("USE.csv")
+	use_file, err := os.Open("USING/USE.csv")
 	if err != nil {
 		log.Fatal(err)
 	}

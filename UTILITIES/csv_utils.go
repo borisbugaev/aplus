@@ -11,12 +11,24 @@ import (
 	printutils "github.com/borisbugaev/go_print_utils/printutils"
 )
 
+const IGNORED_FILES string = "QUESTIONS.TXT,USE.CSV"
+
 func clear_lines(count int) {
 	printutils.Clear_Lines(count)
 }
 
 func print_quant(lines string) int {
 	return printutils.Print_Lines(lines)
+}
+
+func is_any(line string, cs_set string) bool {
+	cs_seq := strings.SplitSeq(cs_set, ",")
+	for str := range cs_seq {
+		if str == line {
+			return true
+		}
+	}
+	return false
 }
 
 func prune_from_file(dir string, filename string, content string) {
@@ -80,8 +92,9 @@ func overlap(my_dir string, prune bool) {
 	}
 	contents := map[string]string{}
 	names := []string{}
+	to_ignore := fmt.Sprintf("%s,ALL.csv", IGNORED_FILES)
 	for _, file := range files {
-		if file.Name() == "ALL.csv" {
+		if is_any(file.Name(), to_ignore) {
 			continue
 		}
 		location := fmt.Sprintf("%s\\%s", my_dir, file.Name())
@@ -126,8 +139,9 @@ func overlap(my_dir string, prune bool) {
 	}
 }
 
-func initialize(repeats bool) {
-	q_file, err := os.Open("../QUESTIONS.TXT")
+func initialize(dir string, repeats bool) {
+	question_location := fmt.Sprintf("%s/QUESTIONS.TXT", dir)
+	q_file, err := os.Open(question_location)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -139,7 +153,8 @@ func initialize(repeats bool) {
 		line_slc = append(line_slc, line)
 	}
 	q_file.Close()
-	all_file, err := os.Create("../USING/ALL.csv")
+	all_location := fmt.Sprintf("%s/ALL.csv", dir)
+	all_file, err := os.Create(all_location)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -151,15 +166,15 @@ func initialize(repeats bool) {
 		all_str = fmt.Sprintf("%s%s,", all_str, answer)
 	}
 	if !repeats {
-		ans := strings.SplitSeq(all_str, ",")
-		an_set := map[string]bool{}
+		answer_seq := strings.SplitSeq(all_str, ",")
+		answer_set := map[string]bool{}
 		no_repeat := ""
-		for a := range ans {
-			_, includes := an_set[a]
+		for a := range answer_seq {
+			_, includes := answer_set[a]
 			if !includes {
 				no_repeat = fmt.Sprintf("%s%s,", no_repeat, a)
 			}
-			an_set[a] = true
+			answer_set[a] = true
 		}
 		all_str = no_repeat
 	}
@@ -178,8 +193,7 @@ func new(dir string, contents map[string]string) string {
 	my_text := fmt.Sprintf("%s/%s.csv", dir, strings.ToUpper(scnr.Text()))
 	_, incl := contents[my_text]
 	for incl {
-		fmt.Print(">> ")
-		line_count++
+		line_count += print_quant(">> ")
 		scnr.Scan()
 		my_text = fmt.Sprintf("%s/%s.csv", dir, strings.ToUpper(scnr.Text()))
 		_, incl = contents[my_text]
@@ -196,6 +210,9 @@ func sort(dir string, to_sort string) {
 	names := []string{}
 	contents := map[string]string{}
 	for _, file := range files {
+		if is_any(file.Name(), IGNORED_FILES) {
+			continue
+		}
 		location := fmt.Sprintf("%s/%s", dir, file.Name())
 		my_file, err := os.Open(location)
 		if err != nil {
@@ -209,12 +226,13 @@ func sort(dir string, to_sort string) {
 		names = append(names, file.Name())
 	}
 	else_subset := map[string]bool{}
+	to_ignore := fmt.Sprintf("%s,ALL.csv,%s", IGNORED_FILES, to_sort)
 	for _, name := range names {
-		if name == to_sort || name == "ALL.csv" {
+		if is_any(name, to_ignore) {
 			continue
 		}
-		name_cont_seq := strings.SplitSeq(contents[name], ",")
-		for item := range name_cont_seq {
+		name_content_seq := strings.SplitSeq(contents[name], ",")
+		for item := range name_content_seq {
 			_, includes := else_subset[item]
 			if !includes {
 				else_subset[item] = true
@@ -234,15 +252,15 @@ func sort(dir string, to_sort string) {
 		to_poll := []string{}
 		default_options := []string{"new...", "skip", "exit"}
 		for _, name := range names {
-			if name == to_sort || name == "ALL.csv" {
+			if is_any(name, to_ignore) {
 				continue
 			}
 			to_poll = append(to_poll, name)
 		}
 		to_poll = append(to_poll, default_options...)
 		scnr := bufio.NewScanner(os.Stdin)
-		resp := printutils.Line_Select_MC(to_poll)
-		for resp == "exit" {
+		response := printutils.Line_Select_MC(to_poll)
+		for response == "exit" {
 			line_count += print_quant("save? y/n\n>>")
 			scnr.Scan()
 			save := strings.ToLower(scnr.Text())
@@ -253,15 +271,15 @@ func sort(dir string, to_sort string) {
 				return
 			}
 		}
-		if resp == "exit" {
+		if response == "exit" {
 			clear_lines(line_count)
 			break
 		}
-		if resp == "skip" {
+		if response == "skip" {
 			clear_lines(line_count)
 			continue
 		}
-		if resp == "new..." {
+		if response == "new..." {
 			new_name := new(dir, contents)
 			nfile, err := os.Create(new_name)
 			if err != nil {
@@ -275,16 +293,15 @@ func sort(dir string, to_sort string) {
 			clear_lines(line_count)
 			continue
 		}
-		contents[resp] = fmt.Sprintf("%s,%s", contents[resp], entry)
-		_, exists := to_write[resp]
+		contents[response] = fmt.Sprintf("%s,%s", contents[response], entry)
+		_, exists := to_write[response]
 		if !exists {
-			to_write[resp] = true
+			to_write[response] = true
 		}
 		clear_lines(line_count)
 	}
 	for target_file := range to_write {
 		location := fmt.Sprintf("%s/%s", dir, target_file)
-		// currently this rewrites the entire file modified. should be changed to append.
 		file, err := os.Create(location)
 		if err != nil {
 			log.Fatal(err)
@@ -307,7 +324,7 @@ func main() {
 		overlap(*dir_ptr, *prune_ptr)
 	}
 	if *init_ptr {
-		initialize(*re_ptr)
+		initialize(*dir_ptr, *re_ptr)
 	}
 	if *sort_ptr != "" {
 		sort_f := fmt.Sprintf("%s.csv", *sort_ptr)
