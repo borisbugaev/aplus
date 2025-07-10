@@ -19,7 +19,7 @@ Use of the `_TOPIC_.csv` files allows the program to ask multiple-choice questio
 
 Also included is a separate [utility program] for managing the .csv files. For more information, see [util_README]
 
-Makes use of [go_print_utils](github.com/borisbugaev/go_print_utils), an extremely minimal package for managing terminal outputs. 
+Makes use of [go_print_utils]([github.com/borisbugaev/go_print_utils](https://pkg.go.dev/github.com/borisbugaev/go_print_utils)), an extremely minimal package for managing terminal outputs. 
 
 At some point I will likely use this as a framework for a more sophisticated, possibly GUI, application.
 
