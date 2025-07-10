@@ -19,32 +19,48 @@ func print_quant(lines string) int {
 	return printutils.Print_Lines(lines)
 }
 
-func prune_from_file(dir string, file string, content string) {
-
+func prune_from_file(dir string, filename string, content string) {
+	location := fmt.Sprintf("%s/%s", dir, filename)
+	file, err := os.Open(location)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	scnr := bufio.NewScanner(file)
+	scnr.Scan()
+	pruned_str := ""
+	entry_seq := strings.SplitSeq(scnr.Text(), ",")
+	file.Close()
+	for entry := range entry_seq {
+		if entry == content {
+			continue
+		}
+		pruned_str = fmt.Sprintf("%s,%s", pruned_str, entry)
+	}
+	pruned_str = strings.Trim(pruned_str, ",")
+	pfile, err := os.Create(location)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer pfile.Close()
+	pfile.WriteString(pruned_str)
+	pfile.Close()
 }
 
 func pruner(dir string, files string, content string) {
-	line_count, index := 1, 0
+	line_count := 1
 	lines := fmt.Sprintf("value %s in files...\n", content)
 	options := fmt.Sprintf("%s,cancel", files)
 	opt_seq := strings.SplitSeq(options, ",")
-	opt_at := map[string]string{}
+	opts := []string{}
 	for opt := range opt_seq {
-		lttr := fmt.Sprintf("%c", 'A'+index)
-		lines = fmt.Sprintf("%s%s> %s\n", lines, lttr, opt)
-		opt_at[lttr] = opt
-		index++
+		opts = append(opts, opt)
 	}
-	lines = fmt.Sprintf("%sdelete %s from...\n>> ", lines, content)
+	lines = fmt.Sprintf("%sdelete %s from...\n", lines, content)
 	line_count += print_quant(lines)
-	scnr := bufio.NewScanner(os.Stdin)
-	scnr.Scan()
-	opt_selected, ok := opt_at[strings.ToUpper(scnr.Text())]
-	if !ok {
-		opt_selected = "cancel"
-	}
+	opt_selected := printutils.Line_Select_MC(opts)
 	clear_lines(line_count)
-	if opt_selected == "cancel" {
+	if opt_selected == "cancel" || opt_selected == "\a" {
 		return
 	}
 	prune_from_file(dir, opt_selected, content)
@@ -102,7 +118,7 @@ func overlap(my_dir string, prune bool) {
 		} else if strings.Contains(content_set[entry], ",") {
 			if prune {
 				pruner(my_dir, content_set[entry], entry)
-				return
+				continue
 			}
 			out_str := fmt.Sprintf("%s in files %s\n", entry, content_set[entry])
 			fmt.Print(out_str)
@@ -223,9 +239,7 @@ func sort(dir string, to_sort string) {
 			}
 			to_poll = append(to_poll, name)
 		}
-		for _, option := range default_options {
-			to_poll = append(to_poll, option)
-		}
+		to_poll = append(to_poll, default_options...)
 		scnr := bufio.NewScanner(os.Stdin)
 		resp := printutils.Line_Select_MC(to_poll)
 		for resp == "exit" {
