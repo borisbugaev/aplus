@@ -10,7 +10,17 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	printutils "github.com/borisbugaev/go_print_utils/printutils"
 )
+
+func print_quant(content string) int {
+	return printutils.Print_Lines(content)
+}
+
+func clear_lines(count int) {
+	printutils.Clear_Lines(count)
+}
 
 const Choices int = 4
 const Choices_ext int = 6
@@ -32,12 +42,13 @@ func quiz(ans string, typesmap map[string]string) bool {
 	}
 	if my_type == "NOTYPE" {
 		scanr := bufio.NewScanner(os.Stdin)
-		fmt.Print(">> ")
+		line_count := print_quant(">> ")
 		scanr.Scan()
 		response := scanr.Text()
 		response = strings.Trim(response, " ")
 		response = strings.ToLower(response)
 		ans = strings.ToLower(ans)
+		clear_lines(line_count)
 		return response == ans
 	}
 	is_cs := strings.Contains(ans, ",")
@@ -60,13 +71,13 @@ func main() {
 	}
 	defer use_file.Close()
 
-	line_count := 0
+	file_line_count := 0
 	fscanr := bufio.NewScanner(q_file)
 	var line_slc = []string{}
 	for fscanr.Scan() {
 		line := fscanr.Text()
 		line_slc = append(line_slc, line)
-		line_count++
+		file_line_count++
 	}
 	q_file.Close()
 	fscanr = bufio.NewScanner(use_file)
@@ -112,7 +123,7 @@ func main() {
 	correct := false
 	quit := false
 	wrong_set := []string{}
-	seed := rand.New(rand.NewSource(time.Now().UnixNano()))
+	seed := rand.New(rand.NewSource(time.Now().UnixMilli()))
 	prev_val := map[int]bool{}
 	for !quit {
 		if qquant == counter {
@@ -134,9 +145,9 @@ func main() {
 				}
 			}
 		}
-		rand_q_i := seed.Intn(line_count)
+		rand_q_i := seed.Intn(file_line_count)
 		for prev_val[rand_q_i] {
-			rand_q_i = seed.Intn(line_count)
+			rand_q_i = seed.Intn(file_line_count)
 		}
 		prev_val[rand_q_i] = true
 		r_line := line_slc[rand_q_i]
@@ -144,15 +155,17 @@ func main() {
 		answer := strings.Split(r_line, ":")[1]
 		question = strings.Trim(question, " ")
 		answer = strings.Trim(answer, " ")
-		fmt.Println(question)
+		question = fmt.Sprintln(question)
+		line_count := print_quant(question)
 		correct = quiz(answer, type_map)
 		if !correct {
 			wrong_set = append(wrong_set, r_line)
 			if *pedant_ptr {
-				fmt.Print("\x1b[1A\x1b[93;41m>>\x1b[G\n\x1b[0m")
-				fmt.Printf("\x1b[3m>> %s\x1b[0m\n", answer)
+				line_count += print_quant("\x1b[1A\x1b[93;41m>>\x1b[G\n\x1b[0m")
+				line_count += print_quant(fmt.Sprintf("\x1b[3m>> %s\x1b[0m\n", answer))
 			}
 		}
+		clear_lines(line_count)
 		counter++
 	}
 	review(wrong_set)

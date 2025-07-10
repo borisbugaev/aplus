@@ -2,28 +2,36 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"math/rand"
 	"os"
 	"slices"
 	"strconv"
 	"strings"
 	"time"
+
+	printutils "github.com/borisbugaev/go_print_utils/printutils"
 )
 
 func true_false(a bool) bool {
-	fmt.Println("TRUE\t\t\tFALSE")
+	line_count := print_quant("TRUE\t\t\tFALSE\n>> ")
 	scnr := bufio.NewScanner(os.Stdin)
-	fmt.Print(">> ")
 	scnr.Scan()
 	answr := scnr.Text()
 	answr = strings.ToLower(answr)
-	if answr == "true" && a {
-		return true
-	} else if answr == "false" && !a {
-		return true
+	if answr == "t" {
+		answr = "true"
 	}
-	return false
+	if answr == "f" {
+		answr = "false"
+	}
+	correct := false
+	if answr == "true" && a {
+		correct = true
+	} else if answr == "false" && !a {
+		correct = true
+	}
+	clear_lines(line_count)
+	return correct
 }
 
 func q_concat(a [Choices]string, b [Choices]string) [Choices]string {
@@ -69,39 +77,24 @@ func get_multi_answrs(ans string, acro string) bool {
 	seed.Shuffle(len(optns), func(i, j int) {
 		optns[i], optns[j] = optns[j], optns[i]
 	})
-	out_optns := [Choices_ext]string{}
-	mp_optns := map[string]string{}
-	for i := range Choices_ext {
-		lttr := fmt.Sprintf("%c", 'A'+i)
-		out_optns[i] = fmt.Sprintf("%s: %s", lttr, optns[i])
-		mp_optns[lttr] = optns[i]
-		llttr := fmt.Sprintf("%c", 'a'+i)
-		mp_optns[llttr] = optns[i]
-	}
-	for i := range Choices_ext {
-		fmt.Printf("%s\n", out_optns[i])
-	}
-	scnnr := bufio.NewScanner(os.Stdin)
-	fmt.Print(">> ")
-	scnnr.Scan()
-	my_nswr := scnnr.Text()
-	sl_my := strings.Fields(my_nswr)
+	response_cs := printutils.Line_Select_MC(optns)
+	r_seq := strings.SplitSeq(response_cs, ",")
+	counter := 0
 	correct := true
-	for i := range len(sl_my) {
-		if len(sl_my) != len(answrs) {
+	for response := range r_seq {
+		if response == "\a" {
 			correct = false
-			break
+			continue
 		}
-		cstr, includes := mp_optns[sl_my[i]]
+		_, includes := a_set[response]
 		if !includes {
 			correct = false
-			break
+			continue
 		}
-		_, includes = a_set[cstr]
-		if !includes {
-			correct = false
-			break
-		}
+		counter++
+	}
+	if counter != len(answrs) {
+		correct = false
 	}
 	return correct
 }
@@ -251,29 +244,9 @@ func get_mult_choic(ans string, acro string) bool {
 		// default case, should not occur
 	}
 	// print options and get answer
-	out_optns := [Choices]string{}
-	mp_optns := map[string]string{}
-	for i := range Choices {
-		lttr := fmt.Sprintf("%c", 'A'+i)
-		out_optns[i] = fmt.Sprintf("%s: %s", lttr, optns[i])
-		mp_optns[lttr] = optns[i]
-		llttr := fmt.Sprintf("%c", 'a'+i)
-		mp_optns[llttr] = optns[i]
-	}
-	for i := range Choices {
-		if strings.Contains(out_optns[i], "\a") {
-			continue
-		} else {
-			fmt.Printf("%s\n", out_optns[i])
-		}
-	}
-	scnnr := bufio.NewScanner(os.Stdin)
-	fmt.Print(">> ")
-	scnnr.Scan()
-	my_nswr := scnnr.Text()
-	cstr := mp_optns[my_nswr]
+	response := printutils.Line_Select_MC(optns[:])
 	correct := false
-	if cstr == ans {
+	if response == ans {
 		correct = true
 	}
 	return correct
