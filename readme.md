@@ -1,5 +1,5 @@
-# a program to help me study for qualification exams
-### and brush up on go
+# APLUS
+### a program to help me study for qualification exams and brush up on go
 
 "APLUS" is a straightforward go program to quiz oneself in the command line.
 
