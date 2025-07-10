@@ -1,2 +1,6 @@
 github.com/borisbugaev/go_print_utils v0.1.0 h1:NRxuUS0pPinj818GYISrBIQV9WQFvgAkF8/CrkFdUNY=
 github.com/borisbugaev/go_print_utils v0.1.0/go.mod h1:B0VUr+z03gprgrPrjjMC64VJ9hoGHMxjg6I4UWYgzRc=
+github.com/borisbugaev/go_print_utils v0.1.1-0.20250710031438-1bbec28b8c0c h1:JG4K2hmW6tRLf4g3ALzXwmO/Iv6TL59r9xJZBa8l/Jc=
+github.com/borisbugaev/go_print_utils v0.1.1-0.20250710031438-1bbec28b8c0c/go.mod h1:B0VUr+z03gprgrPrjjMC64VJ9hoGHMxjg6I4UWYgzRc=
+github.com/borisbugaev/go_print_utils v0.1.2 h1:LxMvGFLkoRRUdFwpqqpgplyGpVc8b0ixFC+i3Jrzpy0=
+github.com/borisbugaev/go_print_utils v0.1.2/go.mod h1:B0VUr+z03gprgrPrjjMC64VJ9hoGHMxjg6I4UWYgzRc=
