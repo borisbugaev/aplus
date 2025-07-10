@@ -17,7 +17,7 @@ The program works best with a few `_TOPIC_.csv` files. These files contain plaus
 
 Use of the `_TOPIC_.csv` files allows the program to ask multiple-choice questions, by randomly[^2] populating each option from a relevant list. All `_TOPIC_` files are also stored in /USING.
 
-Also included is a separate [utility program](github.com/borisbugaev/aplus/utilities) for managing the .csv files. For more information, see [util_README](github.com/borisbugaev/aplus/utilities/README.md)
+Also included is a separate [utility program](github.com/borisbugaev/aplus/UTILITIES) for managing the .csv files. For more information, see [util_README](github.com/borisbugaev/aplus/UTILITIES/README.md)
 
 Makes use of [go_print_utils](github.com/borisbugaev/go_print_utils), an extremely minimal package for managing terminal outputs. 
 
