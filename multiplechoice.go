@@ -188,7 +188,7 @@ func mlt_chc_acr_r(txt []string, ans string, acro string) [Choices]string {
 	return optns
 }
 
-func get_mult_choic(ans string, acro string) bool {
+func get_mult_choic(ans string, acro string, strict bool) bool {
 	words := strings.Fields(ans)
 	acrw := strings.Split(acro, ",")
 	if len(acrw) == 2 && acrw[0] == "True" {
@@ -197,6 +197,9 @@ func get_mult_choic(ans string, acro string) bool {
 	}
 	intoptns := [Choices]string{"DEFAULT"}
 	for i := range len(words) {
+		if strict {
+			break
+		}
 		w_num, err := strconv.Atoi(words[i])
 		if err == nil {
 			if len(words) == 1 {

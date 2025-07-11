@@ -14,6 +14,10 @@ import (
 	printutils "github.com/borisbugaev/go_print_utils/printutils"
 )
 
+const Choices int = 4
+const Choices_ext int = 6
+const NON_NUMERALS string = "abcdefghijklmnopqrstuvwxyz,./;'[]{}|()*&^%$#@!~`"
+
 func print_quant(content string) int {
 	return printutils.Print_Lines(content)
 }
@@ -22,23 +26,27 @@ func clear_lines(count int) {
 	printutils.Clear_Lines(count)
 }
 
-const Choices int = 4
-const Choices_ext int = 6
-
-func quiz(ans string, typesmap map[string]string) bool {
+func quiz(answer string, typesmap map[string]string) bool {
+	strict := false
 	var my_type string = "NOTYPE"
 	type_names := strings.SplitSeq(typesmap["DEFAULT"], ",")
-	for name := range type_names {
-		if name == "DEFAULT" {
+	for type_name := range type_names {
+		if type_name == "DEFAULT" {
 			continue
 		}
-		twords := strings.SplitSeq(typesmap[name], ",")
-		for word := range twords {
-			if strings.Contains(ans, word) {
-				my_type = name
+		type_word_seq := strings.SplitSeq(typesmap[type_name], ",")
+		for word := range type_word_seq {
+			if strings.Contains(answer, word) {
+				my_type = type_name
+				if word == answer {
+					strict = true
+				}
 				break
 			}
 		}
+	}
+	if !strings.ContainsAny(answer, NON_NUMERALS) {
+		return get_mult_choic(answer, "", false)
 	}
 	if my_type == "NOTYPE" {
 		scanr := bufio.NewScanner(os.Stdin)
@@ -47,16 +55,16 @@ func quiz(ans string, typesmap map[string]string) bool {
 		response := scanr.Text()
 		response = strings.Trim(response, " ")
 		response = strings.ToLower(response)
-		ans = strings.ToLower(ans)
+		answer = strings.ToLower(answer)
 		clear_lines(line_count)
-		return response == ans
+		return response == answer
 	}
-	is_cs := strings.Contains(ans, ",")
+	is_cs := strings.Contains(answer, ",")
 	if is_cs {
-		return get_multi_answrs(ans, typesmap[my_type])
+		return get_multi_answrs(answer, typesmap[my_type])
 	}
 
-	return get_mult_choic(ans, typesmap[my_type])
+	return get_mult_choic(answer, typesmap[my_type], strict)
 }
 
 func main() {
