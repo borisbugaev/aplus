@@ -7,7 +7,6 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -111,22 +110,11 @@ func main() {
 			t_file.Close()
 		}
 	}
-	mqs_ptr := flag.Bool("mqs", false, "if true, question count is runtime defined")
+	qs_ptr := flag.Int("qs", 30, "if set, question count is runtime defined")
 	force_ptr := flag.Int("force", -1, "force first question")
 	pedant_ptr := flag.Bool("pedant", false, "provide answer checks immediately")
 	flag.Parse()
-	qquant := 30 // else question count defaults to 30
-	if *mqs_ptr {
-		scanr := bufio.NewScanner(os.Stdin)
-		fmt.Print("# Questions to ask>> ")
-		scanr.Scan()
-		qstr := scanr.Text()
-		iqquant, qerr := strconv.Atoi(qstr)
-		if qerr != nil {
-			qquant = 0
-		}
-		qquant = iqquant
-	}
+	qquant := *qs_ptr
 	counter := 0
 	correct := false
 	quit := false
