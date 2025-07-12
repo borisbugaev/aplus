@@ -202,7 +202,7 @@ func new(dir string, contents map[string]string) string {
 	return my_text
 }
 
-func sort(dir string, to_sort string) {
+func sort(dir string, to_sort string, move bool) {
 	files, err := os.ReadDir(dir)
 	if err != nil {
 		log.Fatal(err)
@@ -240,7 +240,11 @@ func sort(dir string, to_sort string) {
 		}
 	}
 	all_seq := strings.SplitSeq(contents[to_sort], ",")
+	to_sort_contents_copy := contents[to_sort]
 	to_write := map[string]bool{}
+	if move {
+		to_write[to_sort] = true
+	}
 	for entry := range all_seq {
 		_, includes := else_subset[entry]
 		if includes {
@@ -294,11 +298,26 @@ func sort(dir string, to_sort string) {
 			continue
 		}
 		contents[response] = fmt.Sprintf("%s,%s", contents[response], entry)
+		if move {
+			splits := strings.Split(to_sort_contents_copy, entry)
+			for i, split := range splits {
+				split = strings.Trim(split, ",")
+				if i == 0 {
+					to_sort_contents_copy = split
+					continue
+				} else {
+					to_sort_contents_copy = fmt.Sprintf("%s,%s", to_sort_contents_copy, split)
+				}
+			}
+		}
 		_, exists := to_write[response]
 		if !exists {
 			to_write[response] = true
 		}
 		clear_lines(line_count)
+	}
+	if move {
+		contents[to_sort] = to_sort_contents_copy
 	}
 	for target_file := range to_write {
 		location := fmt.Sprintf("%s/%s", dir, target_file)
@@ -319,6 +338,7 @@ func main() {
 	init_ptr := flag.Bool("init", false, "generate initial csv of answers")
 	re_ptr := flag.Bool("re", false, "include repeats")
 	sort_ptr := flag.String("sort", "", "run sort function on designated csv")
+	mov_ptr := flag.Bool("mov", false, "remove sorted file from original location")
 	flag.Parse()
 	if *o_ptr {
 		overlap(*dir_ptr, *prune_ptr)
@@ -328,6 +348,6 @@ func main() {
 	}
 	if *sort_ptr != "" {
 		sort_f := fmt.Sprintf("%s.csv", *sort_ptr)
-		sort(*dir_ptr, sort_f)
+		sort(*dir_ptr, sort_f, *mov_ptr)
 	}
 }
